@@ -170,6 +170,12 @@ def for_ui(filename):
     comp_result = tk.StringVar()
     final_remarks = tk.StringVar()
 
+    ''
+    image_path = "C:\\Users\\HARSH.LAPTOP-OHBF98MR\\Downloads\\"  # Replace "your_image.jpg" with the actual path to your image
+    img = tk.PhotoImage(file=image_path)
+    image_label = tk.Label(root, image=img, bg="#121212")
+    image_label.grid(row=0, column=0, sticky='nw')'''
+
     label_title = tk.Label(root, text="Enter information for the new record:", font=("TkDefaultFont", 12, "bold"), fg="white", bg="black")
     label_title.grid(row=0, column=0, columnspan=2, sticky='w')
 
