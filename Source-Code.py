@@ -1,4 +1,10 @@
 
+import csv
+import tkinter as tk
+from tkinter import ttk, simpledialog
+import hashlib
+import datetime
+import multiprocessing
 
 '''def create_blockchain_from_csv_file(filename):
     ch = input('Do you want to enter a new record? (T for yes) ')
@@ -13,13 +19,6 @@
         final_remarks = input('Enter the remark: ')
         write_new_data_to_csv_file(filename, apaar_id, name, class_, marks, achievements, competition, comp_result, final_remarks)
 '''
-import csv
-import tkinter as tk
-from tkinter import ttk, simpledialog
-import hashlib
-import datetime
-import multiprocessing
-
 
 class Block:
     def __init__(self, data, previous_hash):
