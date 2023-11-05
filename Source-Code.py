@@ -1,7 +1,4 @@
-import csv
-import tkinter as tk
-from tkinter import ttk
-from tkinter import simpledialog
+
 
 '''def create_blockchain_from_csv_file(filename):
     ch = input('Do you want to enter a new record? (T for yes) ')
@@ -16,8 +13,49 @@ from tkinter import simpledialog
         final_remarks = input('Enter the remark: ')
         write_new_data_to_csv_file(filename, apaar_id, name, class_, marks, achievements, competition, comp_result, final_remarks)
 '''
+import csv
+import tkinter as tk
+from tkinter import ttk, simpledialog
+import hashlib
+import datetime
+import multiprocessing
 
-def for_ui(filename):
+
+class Block:
+    def __init__(self, data, previous_hash):
+        self.data = data
+        self.previous_hash = previous_hash
+        self.timestamp = datetime.datetime.now()
+        self.nonce = 0
+        self.hash = self.calculate_hash()
+
+    def calculate_hash(self):
+        data_str = str(self.data) + str(self.timestamp) + str(self.nonce) + str(self.previous_hash)
+        return hashlib.sha256(data_str.encode()).hexdigest()
+
+    def mine_block(self, difficulty):
+        while self.hash[:difficulty] != "0" * difficulty:
+            self.nonce += 1
+            self.hash = self.calculate_hash()
+
+class Blockchain:
+    def __init__(self):
+        self.chain = [self.create_genesis_block()]
+        self.difficulty = 4
+
+    def create_genesis_block(self):
+        return Block("Genesis Block", "0")
+
+    def add_block(self, data):
+        previous_hash = self.get_latest_block().hash
+        new_block = Block(data, previous_hash)
+        new_block.mine_block(self.difficulty)
+        self.chain.append(new_block)
+
+    def get_latest_block(self):
+        return self.chain[-1]
+
+def for_ui(filename, blockchain):
     def submit_data():
         apaar_id_val = apaar_id.get()
         name_val = name.get()
@@ -27,6 +65,14 @@ def for_ui(filename):
         competition_val = competition.get()
         comp_result_val = comp_result.get()
         final_remarks_val = final_remarks.get()
+
+        data = [apaar_id_val, name_val, class_val, marks_val, achievements_val, competition_val, comp_result_val, final_remarks_val]
+
+        # Add the Apaar ID to the Apaar ID block in the blockchain
+        blockchain.add_block(apaar_id_val)
+
+        # Add the data to the Data block in the blockchain
+        blockchain.add_block(data)
 
         write_new_data_to_csv_file(filename, apaar_id_val, name_val, class_val, marks_val, achievements_val, competition_val, comp_result_val, final_remarks_val)
         clear_fields()
@@ -156,7 +202,10 @@ def for_ui(filename):
             with open(filename, 'w', newline="") as f:
                 f.truncate(0)  # Clear the file
             display_data()
+    process_pool = multiprocessing.Pool()
 
+    def submit_data_parallel():
+        process_pool.apply_async(submit_data)
     root = tk.Tk()
     root.title("APAAR User Interface")
     root.configure(bg="#121212")
@@ -169,12 +218,6 @@ def for_ui(filename):
     competition = tk.StringVar()
     comp_result = tk.StringVar()
     final_remarks = tk.StringVar()
-
-    ''
-    image_path = "C:\\Users\\HARSH.LAPTOP-OHBF98MR\\Downloads\\"  # Replace "your_image.jpg" with the actual path to your image
-    img = tk.PhotoImage(file=image_path)
-    image_label = tk.Label(root, image=img, bg="#121212")
-    image_label.grid(row=0, column=0, sticky='nw')'''
 
     label_title = tk.Label(root, text="Enter information for the new record:", font=("TkDefaultFont", 12, "bold"), fg="white", bg="black")
     label_title.grid(row=0, column=0, columnspan=2, sticky='w')
@@ -227,12 +270,12 @@ def for_ui(filename):
     delete_button.grid(row=13, column=0, columnspan=2)
 
     exit_button = tk.Button(root, text="Exit", command=exit_program, bg="#E0E0E0", fg="#121212")
-    exit_button.grid(row=14, column=0, columnspan=2,sticky='sw')
+    exit_button.grid(row=14, column=0, columnspan=2, sticky='sw')
 
     # Add a "Delete All Data" button
-    delete_button = tk.Button(root, text="Delete All Data", command=delete_all_data, bg="#E0E0E0", fg="#121212")
-    delete_button.grid(row=14, column=0, columnspan=2)
-   
+    delete_button_all = tk.Button(root, text="Delete All Data", command=delete_all_data, bg="#E0E0E0", fg="#121212")
+    delete_button_all.grid(row=14, column=1, columnspan=2)
+    
     # Create a Treeview to display the data in a table format with a Chinese black backdrop
     style = ttk.Style()
     style.configure("Treeview.Heading", background="#E0E0E0", foreground="#121212")  # For column headers
@@ -293,14 +336,11 @@ def main():
     filen = input('Enter the name of the CSV file: ')
     filename = filen + '.csv'
 
-    with open(filename, 'a+') as f:
-        '''
-        inf = input('Is the header already there? (N/n if not, any other key to continue): ')
-        if inf == 'n' or inf == 'N':
-            writer = csv.writer(f)
-            writer.writerow(['Apaar id', 'Name', 'Class', 'Marks', 'Achievements', 'Competition', 'Result', 'Remarks'])
-        '''
-    for_ui(filename)
+    with open(filename, 'a+'):
+        pass
+
+    blockchain = Blockchain()
+    for_ui(filename, blockchain)
 
 if __name__ == '__main__':
     main()
