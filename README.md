@@ -1,4 +1,3 @@
-# APAAR-Link
 # APAAR Link: A Blockchain-based Student Record System
 
 APAAR Link is an innovative project that leverages blockchain technology to store and manage student records securely and efficiently. It provides a user-friendly graphical user interface (GUI) using tkinter, 
